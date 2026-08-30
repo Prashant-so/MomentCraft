@@ -1,6 +1,7 @@
 # MomentCraft configuration
-# This file will grow as features land — Phase 3 (manual zones) is the
-# first feature with a real setting: which item acts as the selection wand.
+# This file grows as features land. Phase 4 adds the capture buffer:
+# a rolling window of player state inside active zones, sampled at a
+# low, configurable rate so it stays cheap even with several zones active.
 
 config-version: 1
 
@@ -10,8 +11,15 @@ general:
 zones:
   wand-material: STICK
 
+capture:
+  # How often (in server ticks, 20 = 1 second) to sample players inside
+  # active zones. Lower = more precise lead-up footage later, higher cost.
+  sample-interval-ticks: 10
+  # How many seconds of history to keep per zone before old snapshots
+  # get dropped.
+  buffer-seconds: 15
+
 # Placeholder sections — filled in as each phase is implemented.
-# capture:
 # scoring:
 # performance:
 # storage:
