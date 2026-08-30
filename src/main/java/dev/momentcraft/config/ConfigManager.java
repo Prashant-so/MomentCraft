@@ -62,6 +62,18 @@ public final class ConfigManager {
         return (int) Math.max(1, (bufferSeconds * TICKS_PER_SECOND) / interval);
     }
 
+    public double getPerformanceThrottleTps() {
+        return config.getDouble("performance.throttle-below-tps", 18.0);
+    }
+
+    public double getPerformancePauseTps() {
+        return config.getDouble("performance.pause-below-tps", 15.0);
+    }
+
+    public double getPerformanceMinFreeMemoryRatio() {
+        return config.getDouble("performance.min-free-memory-percent", 10.0) / 100.0;
+    }
+
     public FileConfiguration raw() {
         return config;
     }
