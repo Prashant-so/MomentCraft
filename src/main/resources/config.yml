@@ -1,7 +1,7 @@
 # MomentCraft configuration
-# This file grows as features land. Phase 4 adds the capture buffer:
-# a rolling window of player state inside active zones, sampled at a
-# low, configurable rate so it stays cheap even with several zones active.
+# This file grows as features land. Phase 5 adds the performance guard:
+# it watches TPS and free memory, and throttles or pauses capture
+# sampling automatically under load, resuming once things recover.
 
 config-version: 1
 
@@ -19,8 +19,17 @@ capture:
   # get dropped.
   buffer-seconds: 15
 
+performance:
+  # Below this TPS, capture sampling is throttled to every other cycle
+  # instead of running fully.
+  throttle-below-tps: 18.0
+  # Below this TPS, capture sampling is paused entirely until TPS recovers.
+  pause-below-tps: 15.0
+  # If free heap memory drops below this percentage, capture is paused
+  # regardless of TPS.
+  min-free-memory-percent: 10.0
+
 # Placeholder sections — filled in as each phase is implemented.
 # scoring:
-# performance:
 # storage:
 # discord:
