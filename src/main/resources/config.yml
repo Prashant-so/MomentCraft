@@ -4,7 +4,6 @@
 
 config-version: 1
 
-# General
 general:
   debug: false
 
