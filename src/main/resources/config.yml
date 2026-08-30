@@ -1,15 +1,17 @@
 # MomentCraft configuration
-# This file will grow as features land — right now it's just the skeleton
-# so the plugin has something to load on startup.
+# This file will grow as features land — Phase 3 (manual zones) is the
+# first feature with a real setting: which item acts as the selection wand.
 
 config-version: 1
 
 general:
   debug: false
 
+zones:
+  wand-material: STICK
+
 # Placeholder sections — filled in as each phase is implemented.
 # capture:
-# zones:
 # scoring:
 # performance:
 # storage:
