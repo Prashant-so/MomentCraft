@@ -34,7 +34,7 @@ public final class ZoneCommand implements SubCommand {
 
     @Override
     public String usage() {
-        return "/momentcraft zone <create|delete|list|info|enable|disable> [name]";
+        return "/momentcraft zone <create|delete|list|info|enable|disable|buffer> [name]";
     }
 
     @Override
@@ -59,6 +59,7 @@ public final class ZoneCommand implements SubCommand {
             case "info" -> info(sender, rest);
             case "enable" -> setEnabled(sender, rest, true);
             case "disable" -> setEnabled(sender, rest, false);
+            case "buffer" -> buffer(sender, rest);
             default -> sender.sendMessage(Component.text("Unknown zone action. Usage: " + usage(), NamedTextColor.RED));
         }
     }
@@ -66,7 +67,7 @@ public final class ZoneCommand implements SubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return List.of("create", "delete", "list", "info", "enable", "disable").stream()
+            return List.of("create", "delete", "list", "info", "enable", "disable", "buffer").stream()
                 .filter(a -> a.startsWith(args[0].toLowerCase()))
                 .toList();
         }
@@ -192,5 +193,22 @@ public final class ZoneCommand implements SubCommand {
             sender.sendMessage(Component.text(
                 "Zone '" + zone.id() + "' " + (enabled ? "enabled" : "disabled") + ".", NamedTextColor.GREEN));
         }, () -> sender.sendMessage(Component.text("No zone named '" + args[0] + "' exists.", NamedTextColor.RED)));
+    }
+
+    private void buffer(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            sender.sendMessage(Component.text("Usage: /momentcraft zone buffer <name>", NamedTextColor.RED));
+            return;
+        }
+
+        String id = args[0].toLowerCase();
+        if (plugin.getZoneManager().get(id).isEmpty()) {
+            sender.sendMessage(Component.text("No zone named '" + id + "' exists.", NamedTextColor.RED));
+            return;
+        }
+
+        int size = plugin.getCaptureManager().bufferSize(id);
+        sender.sendMessage(Component.text(
+            "Zone '" + id + "' buffer: " + size + " snapshot(s).", NamedTextColor.GRAY));
     }
 }
