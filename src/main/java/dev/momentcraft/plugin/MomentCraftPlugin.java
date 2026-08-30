@@ -1,5 +1,6 @@
 package dev.momentcraft.plugin;
 
+import dev.momentcraft.capture.CaptureManager;
 import dev.momentcraft.command.MomentCraftCommand;
 import dev.momentcraft.config.ConfigManager;
 import dev.momentcraft.zone.SelectionManager;
@@ -15,6 +16,7 @@ public final class MomentCraftPlugin extends JavaPlugin {
     private ConfigManager configManager;
     private ZoneManager zoneManager;
     private SelectionManager selectionManager;
+    private CaptureManager captureManager;
     private NamespacedKey wandKey;
 
     @Override
@@ -29,6 +31,9 @@ public final class MomentCraftPlugin extends JavaPlugin {
         zoneManager = new ZoneManager(this);
         zoneManager.loadAll();
 
+        captureManager = new CaptureManager(this);
+        captureManager.start();
+
         getServer().getPluginManager().registerEvents(new WandListener(selectionManager, wandKey), this);
 
         registerCommands();
@@ -38,6 +43,9 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (captureManager != null) {
+            captureManager.stop();
+        }
         getLogger().info("MomentCraft disabled.");
         instance = null;
     }
@@ -63,6 +71,10 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
     public SelectionManager getSelectionManager() {
         return selectionManager;
+    }
+
+    public CaptureManager getCaptureManager() {
+        return captureManager;
     }
 
     public NamespacedKey getWandKey() {
