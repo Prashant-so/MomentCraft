@@ -3,11 +3,14 @@ package dev.momentcraft.plugin;
 import dev.momentcraft.capture.CaptureManager;
 import dev.momentcraft.command.MomentCraftCommand;
 import dev.momentcraft.config.ConfigManager;
+import dev.momentcraft.moment.MomentListener;
+import dev.momentcraft.moment.MomentManager;
 import dev.momentcraft.performance.PerformanceGuard;
 import dev.momentcraft.zone.SelectionManager;
 import dev.momentcraft.zone.WandListener;
 import dev.momentcraft.zone.ZoneManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +23,7 @@ public final class MomentCraftPlugin extends JavaPlugin {
     private SelectionManager selectionManager;
     private CaptureManager captureManager;
     private PerformanceGuard performanceGuard;
+    private MomentManager momentManager;
     private NamespacedKey wandKey;
 
     @Override
@@ -42,14 +46,16 @@ public final class MomentCraftPlugin extends JavaPlugin {
         captureManager = new CaptureManager(this);
         captureManager.start();
 
+        momentManager = new MomentManager(this);
+
         getServer().getPluginManager().registerEvents(new WandListener(selectionManager, wandKey), this);
+        getServer().getPluginManager().registerEvents(new MomentListener(this), this);
 
         registerCommands();
 
         getComponentLogger().info(MiniMessage.miniMessage().deserialize(
             "<green>MomentCraft enabled.</green> <gray>(v<version>)</gray>",
-            net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.unparsed(
-                "version", getPluginMeta().getVersion())
+            Placeholder.unparsed("version", getPluginMeta().getVersion())
         ));
     }
 
@@ -102,6 +108,10 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
     public PerformanceGuard getPerformanceGuard() {
         return performanceGuard;
+    }
+
+    public MomentManager getMomentManager() {
+        return momentManager;
     }
 
     public NamespacedKey getWandKey() {
