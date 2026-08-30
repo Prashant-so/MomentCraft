@@ -6,8 +6,7 @@ import dev.momentcraft.command.subcommands.VersionCommand;
 import dev.momentcraft.command.subcommands.WandCommand;
 import dev.momentcraft.command.subcommands.ZoneCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.momentcraft.util.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,12 +43,12 @@ public final class MomentCraftCommand implements CommandExecutor, TabCompleter {
 
         SubCommand sub = subCommands.get(args[0].toLowerCase());
         if (sub == null) {
-            sender.sendMessage(Component.text("Unknown subcommand. Use /momentcraft for a list.", NamedTextColor.RED));
+            Messages.error(sender, "Unknown subcommand. Run <white>/momentcraft</white> for a list.");
             return true;
         }
 
         if (sub.permission() != null && !sender.hasPermission(sub.permission())) {
-            sender.sendMessage(Component.text("You don't have permission to do that.", NamedTextColor.RED));
+            Messages.error(sender, "You don't have permission to do that.");
             return true;
         }
 
@@ -79,9 +78,17 @@ public final class MomentCraftCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(Component.text("MomentCraft commands:", NamedTextColor.GOLD));
+        Messages.raw(sender, Messages.DIVIDER);
+        Messages.raw(sender, "<gradient:gold:yellow><bold>              MomentCraft</bold></gradient>");
+        Messages.raw(sender, Messages.DIVIDER);
+
         for (SubCommand sub : subCommands.values()) {
-            sender.sendMessage(Component.text(sub.usage() + " - " + sub.description(), NamedTextColor.GRAY));
+            String usage = sub.usage();
+            String padded = usage + " ".repeat(Math.max(1, 34 - usage.length()));
+            Messages.raw(sender,
+                "<yellow> ▸ </yellow><white>" + padded + "</white><gray>" + sub.description() + "</gray>");
         }
+
+        Messages.raw(sender, Messages.DIVIDER);
     }
 }
