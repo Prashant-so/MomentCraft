@@ -75,11 +75,15 @@ public final class ConfigManager {
     }
 
     public int getScoreThreshold() {
-        return config.getInt("scoring.threshold", 40);
+        return config.getInt("scoring.threshold", 55);
+    }
+
+    public int getScoreCooldownSeconds() {
+        return config.getInt("scoring.cooldown-seconds", 30);
     }
 
     public int getScoreBaseKill() {
-        return config.getInt("scoring.weights.base-kill", 10);
+        return config.getInt("scoring.weights.base-kill", 5);
     }
 
     public int getScoreBaseBossKill() {
@@ -91,7 +95,7 @@ public final class ConfigManager {
     }
 
     public int getScoreKillstreakPerKill() {
-        return config.getInt("scoring.weights.killstreak-per-kill", 5);
+        return config.getInt("scoring.weights.killstreak-per-kill", 8);
     }
 
     public int getScoreDangerBonus() {
@@ -99,7 +103,11 @@ public final class ConfigManager {
     }
 
     public int getScoreNearbyPlayerBonus() {
-        return config.getInt("scoring.weights.nearby-player-bonus", 5);
+        return config.getInt("scoring.weights.nearby-player-bonus", 4);
+    }
+
+    public int getScoreNearbyPlayerCap() {
+        return config.getInt("scoring.nearby-player-cap", 3);
     }
 
     public double getScoreNearbyPlayerRadius() {
