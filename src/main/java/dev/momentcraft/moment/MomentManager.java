@@ -8,7 +8,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class MomentManager {
 
@@ -18,6 +21,7 @@ public final class MomentManager {
     private final MomentScorer scorer;
     private final KillstreakTracker killstreakTracker = new KillstreakTracker();
     private final Deque<ScoredMoment> history = new ArrayDeque<>();
+    private final Map<UUID, Long> lastMomentAt = new HashMap<>();
 
     public MomentManager(MomentCraftPlugin plugin) {
         this.plugin = plugin;
@@ -31,22 +35,43 @@ public final class MomentManager {
     public void submit(MomentEvent event) {
         int score = scorer.score(event);
         ScoredMoment scored = new ScoredMoment(event, score);
+        int threshold = plugin.getConfigManager().getScoreThreshold();
 
         if (plugin.getConfigManager().isDebug()) {
             plugin.getLogger().info(
                 "[moment] " + event.type() + " by " + event.primaryPlayerName() +
-                " scored " + score + " (threshold " + plugin.getConfigManager().getScoreThreshold() + ")"
+                " scored " + score + " (threshold " + threshold + ")"
             );
         }
 
-        if (score < plugin.getConfigManager().getScoreThreshold()) {
+        if (score < threshold) {
             return;
         }
+
+        if (isOnCooldown(event.primaryPlayerId())) {
+            if (plugin.getConfigManager().isDebug()) {
+                plugin.getLogger().info(
+                    "[moment] Suppressed — " + event.primaryPlayerName() + " is still on moment cooldown."
+                );
+            }
+            return;
+        }
+
+        lastMomentAt.put(event.primaryPlayerId(), System.currentTimeMillis());
 
         recordHistory(scored);
         notifyAdmins(scored);
 
         Bukkit.getPluginManager().callEvent(new MomentDetectedEvent(scored));
+    }
+
+    private boolean isOnCooldown(UUID playerId) {
+        Long last = lastMomentAt.get(playerId);
+        if (last == null) {
+            return false;
+        }
+        long cooldownMillis = plugin.getConfigManager().getScoreCooldownSeconds() * 1000L;
+        return (System.currentTimeMillis() - last) < cooldownMillis;
     }
 
     private void recordHistory(ScoredMoment scored) {
