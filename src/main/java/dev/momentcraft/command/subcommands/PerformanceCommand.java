@@ -2,8 +2,7 @@ package dev.momentcraft.command.subcommands;
 
 import dev.momentcraft.command.SubCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.momentcraft.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -22,7 +21,7 @@ public final class PerformanceCommand implements SubCommand {
 
     @Override
     public String description() {
-        return "Shows the current performance guard state.";
+        return "Shows the performance guard state";
     }
 
     @Override
@@ -37,17 +36,20 @@ public final class PerformanceCommand implements SubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        double tps = Bukkit.getServer().getTPS()[0];
+        double tps = Math.min(Bukkit.getServer().getTPS()[0], 20.0);
         var state = plugin.getPerformanceGuard().state();
 
-        NamedTextColor color = switch (state) {
-            case NORMAL -> NamedTextColor.GREEN;
-            case THROTTLED -> NamedTextColor.YELLOW;
-            case PAUSED -> NamedTextColor.RED;
+        String color = switch (state) {
+            case NORMAL -> "green";
+            case THROTTLED -> "yellow";
+            case PAUSED -> "red";
         };
 
-        sender.sendMessage(Component.text("Performance state: " + state, color));
-        sender.sendMessage(Component.text(
-            "TPS: " + String.format("%.1f", Math.min(tps, 20.0)), NamedTextColor.GRAY));
+        Messages.raw(sender, Messages.DIVIDER);
+        Messages.raw(sender, " <gray>State</gray>  <" + color + "><bold><state></bold></" + color + ">",
+            Messages.ph("state", state));
+        Messages.raw(sender, " <gray>TPS</gray>    <white><tps></white>",
+            Messages.ph("tps", String.format("%.1f", tps)));
+        Messages.raw(sender, Messages.DIVIDER);
     }
 }
