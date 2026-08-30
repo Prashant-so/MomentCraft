@@ -7,6 +7,7 @@ import dev.momentcraft.performance.PerformanceGuard;
 import dev.momentcraft.zone.SelectionManager;
 import dev.momentcraft.zone.WandListener;
 import dev.momentcraft.zone.ZoneManager;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,6 +25,8 @@ public final class MomentCraftPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        printBanner();
 
         configManager = new ConfigManager(this);
         configManager.load();
@@ -43,7 +46,19 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
         registerCommands();
 
-        getLogger().info("MomentCraft enabled.");
+        getComponentLogger().info(MiniMessage.miniMessage().deserialize(
+            "<green>MomentCraft enabled.</green> <gray>(v<version>)</gray>",
+            net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.unparsed(
+                "version", getPluginMeta().getVersion())
+        ));
+    }
+
+    private void printBanner() {
+        MiniMessage mm = MiniMessage.miniMessage();
+        getComponentLogger().info(mm.deserialize("<gradient:gold:yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</gradient>"));
+        getComponentLogger().info(mm.deserialize("<gradient:gold:yellow><bold>            MomentCraft</bold></gradient>"));
+        getComponentLogger().info(mm.deserialize("<gray>      cinematic moment detection, self-hosted</gray>"));
+        getComponentLogger().info(mm.deserialize("<gradient:gold:yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</gradient>"));
     }
 
     @Override
@@ -54,7 +69,7 @@ public final class MomentCraftPlugin extends JavaPlugin {
         if (performanceGuard != null) {
             performanceGuard.stop();
         }
-        getLogger().info("MomentCraft disabled.");
+        getComponentLogger().info(MiniMessage.miniMessage().deserialize("<red>MomentCraft disabled.</red>"));
         instance = null;
     }
 
