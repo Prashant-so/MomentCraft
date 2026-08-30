@@ -2,8 +2,7 @@ package dev.momentcraft.command.subcommands;
 
 import dev.momentcraft.command.SubCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.momentcraft.util.Messages;
 import org.bukkit.command.CommandSender;
 
 public final class VersionCommand implements SubCommand {
@@ -21,7 +20,7 @@ public final class VersionCommand implements SubCommand {
 
     @Override
     public String description() {
-        return "Shows the running MomentCraft version.";
+        return "Shows the running version";
     }
 
     @Override
@@ -32,6 +31,6 @@ public final class VersionCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         String version = plugin.getPluginMeta().getVersion();
-        sender.sendMessage(Component.text("MomentCraft v" + version, NamedTextColor.AQUA));
+        Messages.send(sender, "<aqua>v<version></aqua>", Messages.ph("version", version));
     }
 }
