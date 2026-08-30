@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public final class ConfigManager {
 
+    private static final long TICKS_PER_SECOND = 20L;
+
     private final MomentCraftPlugin plugin;
     private FileConfiguration config;
 
@@ -48,6 +50,16 @@ public final class ConfigManager {
         }
 
         return material;
+    }
+
+    public long getCaptureSampleIntervalTicks() {
+        return Math.max(1L, config.getLong("capture.sample-interval-ticks", 10));
+    }
+
+    public int getCaptureBufferCapacity() {
+        long interval = getCaptureSampleIntervalTicks();
+        int bufferSeconds = Math.max(1, config.getInt("capture.buffer-seconds", 15));
+        return (int) Math.max(1, (bufferSeconds * TICKS_PER_SECOND) / interval);
     }
 
     public FileConfiguration raw() {
