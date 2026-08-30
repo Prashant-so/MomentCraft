@@ -11,7 +11,7 @@ load: POSTWORLD
 commands:
   momentcraft:
     description: Main MomentCraft command.
-    usage: /momentcraft <reload|version|wand|zone>
+    usage: /momentcraft <reload|version|wand|zone|performance>
     aliases: [mc]
 
 permissions:
