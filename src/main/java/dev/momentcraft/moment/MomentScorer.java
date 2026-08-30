@@ -31,9 +31,11 @@ public final class MomentScorer {
             score += config.getScoreDangerBonus();
         }
 
-        if (event.nearbyPlayerCount() > 0) {
-            score += event.nearbyPlayerCount() * config.getScoreNearbyPlayerBonus();
-        }
+        // Capped so a merely populated area can't rack up unlimited bonus
+        // on its own — beyond a few witnesses, more players present doesn't
+        // make an ordinary kill meaningfully more "moment"-worthy.
+        int cappedNearby = Math.min(event.nearbyPlayerCount(), config.getScoreNearbyPlayerCap());
+        score += cappedNearby * config.getScoreNearbyPlayerBonus();
 
         return Math.max(0, score);
     }
