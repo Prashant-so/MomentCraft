@@ -2,8 +2,7 @@ package dev.momentcraft.command.subcommands;
 
 import dev.momentcraft.command.SubCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.momentcraft.util.Messages;
 import org.bukkit.command.CommandSender;
 
 public final class ReloadCommand implements SubCommand {
@@ -21,7 +20,7 @@ public final class ReloadCommand implements SubCommand {
 
     @Override
     public String description() {
-        return "Reloads the MomentCraft configuration.";
+        return "Reloads the configuration";
     }
 
     @Override
@@ -37,6 +36,6 @@ public final class ReloadCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         plugin.getConfigManager().reload();
-        sender.sendMessage(Component.text("MomentCraft configuration reloaded.", NamedTextColor.GREEN));
+        Messages.success(sender, "Configuration reloaded.");
     }
 }
