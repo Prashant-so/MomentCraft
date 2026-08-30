@@ -2,6 +2,13 @@
 # This file grows as features land. Phase 6 adds automatic moment
 # detection: real gameplay events get scored, and anything clearing the
 # threshold gets flagged as a moment worth keeping.
+#
+# Tuning note: these defaults are set so that an ordinary, safe, full-health
+# kill with nobody around scores around 5-9 — nowhere near the threshold.
+# Only a real combination of low health, a streak, danger, or witnesses
+# should push something over the line. If "common" moments are still
+# triggering on your server, raise `threshold` or lower the weight that's
+# stacking up too easily — turn on general.debug to see real numbers first.
 
 config-version: 1
 
@@ -12,42 +19,33 @@ zones:
   wand-material: STICK
 
 capture:
-  # How often (in server ticks, 20 = 1 second) to sample players inside
-  # active zones. Lower = more precise lead-up footage later, higher cost.
   sample-interval-ticks: 10
-  # How many seconds of history to keep per zone before old snapshots
-  # get dropped.
   buffer-seconds: 15
 
 performance:
-  # Below this TPS, capture sampling is throttled to every other cycle
-  # instead of running fully.
   throttle-below-tps: 18.0
-  # Below this TPS, capture sampling is paused entirely until TPS recovers.
   pause-below-tps: 15.0
-  # If free heap memory drops below this percentage, capture is paused
-  # regardless of TPS.
   min-free-memory-percent: 10.0
 
 scoring:
   # A moment is only kept/announced if its score meets or exceeds this.
-  threshold: 40
+  threshold: 55
+  # After a player triggers a moment, further moments from that same
+  # player are suppressed for this many seconds — stops one ongoing
+  # killstreak from spamming multiple near-identical notifications.
+  cooldown-seconds: 30
   # How far (in blocks) to look for other players when scoring "audience size".
   nearby-player-radius: 20.0
+  # More than this many nearby players stops adding extra bonus — a
+  # crowded area shouldn't inflate score just from population.
+  nearby-player-cap: 3
   weights:
-    base-kill: 10
+    base-kill: 5
     base-boss-kill: 50
-    # Scales up to this amount as the primary player's health approaches 0
-    # at the moment of the event — this is what makes a low-health kill
-    # score much higher than a full-health one.
     low-health-bonus-max: 30
-    # Added per kill beyond the first in an active killstreak.
-    killstreak-per-kill: 5
-    # Added if the event happened somewhere inherently risky (Nether, End,
-    # or near lava).
+    killstreak-per-kill: 8
     danger-bonus: 10
-    # Added per other nearby player — more witnesses, more of a "moment".
-    nearby-player-bonus: 5
+    nearby-player-bonus: 4
 
 # Placeholder sections — filled in as each phase is implemented.
 # storage:
