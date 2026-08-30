@@ -1,6 +1,7 @@
 package dev.momentcraft.config;
 
 import dev.momentcraft.plugin.MomentCraftPlugin;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public final class ConfigManager {
@@ -34,6 +35,19 @@ public final class ConfigManager {
 
     public boolean isDebug() {
         return config.getBoolean("general.debug", false);
+    }
+
+    public Material getWandMaterial() {
+        String name = config.getString("zones.wand-material", "STICK");
+        Material material = Material.matchMaterial(name);
+
+        if (material == null) {
+            plugin.getLogger().warning(
+                "zones.wand-material '" + name + "' is not a valid material. Falling back to STICK.");
+            return Material.STICK;
+        }
+
+        return material;
     }
 
     public FileConfiguration raw() {
