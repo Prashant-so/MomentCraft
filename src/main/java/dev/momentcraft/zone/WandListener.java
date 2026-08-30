@@ -1,7 +1,6 @@
 package dev.momentcraft.zone;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.momentcraft.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -40,14 +39,14 @@ public final class WandListener implements Listener {
         switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> {
                 selectionManager.setCorner1(player.getUniqueId(), clicked.getLocation());
-                player.sendMessage(Component.text(
-                    "Corner 1 set: " + format(clicked.getLocation()), NamedTextColor.YELLOW));
+                Messages.send(player, "<yellow>Corner 1</yellow> <gray>set at</gray> <white><coords></white>",
+                    Messages.ph("coords", format(clicked.getLocation())));
                 event.setCancelled(true);
             }
             case RIGHT_CLICK_BLOCK -> {
                 selectionManager.setCorner2(player.getUniqueId(), clicked.getLocation());
-                player.sendMessage(Component.text(
-                    "Corner 2 set: " + format(clicked.getLocation()), NamedTextColor.YELLOW));
+                Messages.send(player, "<yellow>Corner 2</yellow> <gray>set at</gray> <white><coords></white>",
+                    Messages.ph("coords", format(clicked.getLocation())));
                 event.setCancelled(true);
             }
             default -> {
