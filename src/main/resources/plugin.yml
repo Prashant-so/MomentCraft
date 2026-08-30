@@ -1,4 +1,4 @@
-name: name: MomentCraft
+name: MomentCraft
 version: '${version}'
 main: dev.momentcraft.plugin.MomentCraftPlugin
 api-version: '1.21'
@@ -18,12 +18,3 @@ permissions:
   momentcraft.admin.reload:
     description: Allows reloading the MomentCraft configuration.
     default: op
-version: '${version}'
-main: dev.momentcraft.plugin.MomentCraftPlugin
-# Floor, not a fixed target: any server 1.21 or newer can load this plugin.
-api-version: '1.21'
-author: YOUR_NAME_HERE
-description: Detects notable gameplay moments and turns them into short cinematic clips.
-website: https://github.com/YOUR_USERNAME/MomentCraft
-
-load: POSTWORLD
