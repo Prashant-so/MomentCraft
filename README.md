@@ -37,3 +37,4 @@ The compiled jar lands in `build/libs/`.
 ## License
 
 MIT — see `LICENSE`.
+
