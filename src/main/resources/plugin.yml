@@ -11,7 +11,7 @@ load: POSTWORLD
 commands:
   momentcraft:
     description: Main MomentCraft command.
-    usage: /momentcraft <reload|version|wand|zone|performance>
+    usage: /momentcraft <reload|version|wand|zone|performance|moments>
     aliases: [mc]
 
 permissions:
@@ -20,4 +20,7 @@ permissions:
     default: op
   momentcraft.admin.zone:
     description: Allows using the wand and managing capture zones.
+    default: op
+  momentcraft.admin.notify:
+    description: Receives moment-detected notifications and can view moment history.
     default: op
