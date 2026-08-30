@@ -74,6 +74,38 @@ public final class ConfigManager {
         return config.getDouble("performance.min-free-memory-percent", 10.0) / 100.0;
     }
 
+    public int getScoreThreshold() {
+        return config.getInt("scoring.threshold", 40);
+    }
+
+    public int getScoreBaseKill() {
+        return config.getInt("scoring.weights.base-kill", 10);
+    }
+
+    public int getScoreBaseBossKill() {
+        return config.getInt("scoring.weights.base-boss-kill", 50);
+    }
+
+    public int getScoreLowHealthBonusMax() {
+        return config.getInt("scoring.weights.low-health-bonus-max", 30);
+    }
+
+    public int getScoreKillstreakPerKill() {
+        return config.getInt("scoring.weights.killstreak-per-kill", 5);
+    }
+
+    public int getScoreDangerBonus() {
+        return config.getInt("scoring.weights.danger-bonus", 10);
+    }
+
+    public int getScoreNearbyPlayerBonus() {
+        return config.getInt("scoring.weights.nearby-player-bonus", 5);
+    }
+
+    public double getScoreNearbyPlayerRadius() {
+        return config.getDouble("scoring.nearby-player-radius", 20.0);
+    }
+
     public FileConfiguration raw() {
         return config;
     }
