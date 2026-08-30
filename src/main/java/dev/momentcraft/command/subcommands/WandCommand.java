@@ -2,6 +2,7 @@ package dev.momentcraft.command.subcommands;
 
 import dev.momentcraft.command.SubCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
+import dev.momentcraft.util.Messages;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,7 +29,7 @@ public final class WandCommand implements SubCommand {
 
     @Override
     public String description() {
-        return "Gives you the zone selection tool.";
+        return "Gives the zone selection tool";
     }
 
     @Override
@@ -44,24 +45,28 @@ public final class WandCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("Only players can use the wand.", NamedTextColor.RED));
+            Messages.error(sender, "Only players can use the wand.");
             return;
         }
 
         ItemStack wand = new ItemStack(plugin.getConfigManager().getWandMaterial());
         ItemMeta meta = wand.getItemMeta();
 
-        meta.displayName(Component.text("MomentCraft Wand", NamedTextColor.GOLD)
-            .decoration(TextDecoration.ITALIC, false));
+        meta.displayName(Component.text("✦ MomentCraft Wand", NamedTextColor.GOLD)
+            .decoration(TextDecoration.ITALIC, false)
+            .decoration(TextDecoration.BOLD, true));
         meta.lore(List.of(
-            Component.text("Left click: corner 1", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-            Component.text("Right click: corner 2", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+            Component.empty(),
+            Component.text("Left click", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+                .append(Component.text("  →  corner 1", NamedTextColor.GRAY)),
+            Component.text("Right click", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+                .append(Component.text("  →  corner 2", NamedTextColor.GRAY))
         ));
         meta.getPersistentDataContainer().set(plugin.getWandKey(), PersistentDataType.BOOLEAN, true);
 
         wand.setItemMeta(meta);
 
         player.getInventory().addItem(wand);
-        player.sendMessage(Component.text("You received the MomentCraft wand.", NamedTextColor.GREEN));
+        Messages.success(sender, "You received the zone selection wand.");
     }
 }
