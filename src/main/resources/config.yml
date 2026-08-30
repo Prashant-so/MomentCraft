@@ -1,0 +1,17 @@
+# MomentCraft configuration
+# This file will grow as features land — right now it's just the skeleton
+# so the plugin has something to load on startup.
+
+config-version: 1
+
+# General
+general:
+  debug: false
+
+# Placeholder sections — filled in as each phase is implemented.
+# capture:
+# zones:
+# scoring:
+# performance:
+# storage:
+# discord:
