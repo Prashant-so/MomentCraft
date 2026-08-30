@@ -2,6 +2,10 @@ package dev.momentcraft.plugin;
 
 import dev.momentcraft.command.MomentCraftCommand;
 import dev.momentcraft.config.ConfigManager;
+import dev.momentcraft.zone.SelectionManager;
+import dev.momentcraft.zone.WandListener;
+import dev.momentcraft.zone.ZoneManager;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MomentCraftPlugin extends JavaPlugin {
@@ -9,6 +13,9 @@ public final class MomentCraftPlugin extends JavaPlugin {
     private static MomentCraftPlugin instance;
 
     private ConfigManager configManager;
+    private ZoneManager zoneManager;
+    private SelectionManager selectionManager;
+    private NamespacedKey wandKey;
 
     @Override
     public void onEnable() {
@@ -16,6 +23,13 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
         configManager = new ConfigManager(this);
         configManager.load();
+
+        wandKey = new NamespacedKey(this, "wand");
+        selectionManager = new SelectionManager();
+        zoneManager = new ZoneManager(this);
+        zoneManager.loadAll();
+
+        getServer().getPluginManager().registerEvents(new WandListener(selectionManager, wandKey), this);
 
         registerCommands();
 
@@ -41,6 +55,18 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public ZoneManager getZoneManager() {
+        return zoneManager;
+    }
+
+    public SelectionManager getSelectionManager() {
+        return selectionManager;
+    }
+
+    public NamespacedKey getWandKey() {
+        return wandKey;
     }
 
     public static MomentCraftPlugin get() {
