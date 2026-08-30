@@ -1,5 +1,6 @@
 package dev.momentcraft.command;
 
+import dev.momentcraft.command.subcommands.MomentsCommand;
 import dev.momentcraft.command.subcommands.PerformanceCommand;
 import dev.momentcraft.command.subcommands.ReloadCommand;
 import dev.momentcraft.command.subcommands.VersionCommand;
@@ -28,6 +29,7 @@ public final class MomentCraftCommand implements CommandExecutor, TabCompleter {
         register(new WandCommand(plugin));
         register(new ZoneCommand(plugin));
         register(new PerformanceCommand(plugin));
+        register(new MomentsCommand(plugin));
     }
 
     private void register(SubCommand subCommand) {
