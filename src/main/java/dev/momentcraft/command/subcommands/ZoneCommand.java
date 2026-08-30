@@ -2,10 +2,9 @@ package dev.momentcraft.command.subcommands;
 
 import dev.momentcraft.command.SubCommand;
 import dev.momentcraft.plugin.MomentCraftPlugin;
+import dev.momentcraft.util.Messages;
 import dev.momentcraft.zone.SelectionManager;
 import dev.momentcraft.zone.Zone;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,12 +28,12 @@ public final class ZoneCommand implements SubCommand {
 
     @Override
     public String description() {
-        return "Manages manual capture zones.";
+        return "Manages capture zones";
     }
 
     @Override
     public String usage() {
-        return "/momentcraft zone <create|delete|list|info|enable|disable|buffer> [name]";
+        return "/momentcraft zone <action> [name]";
     }
 
     @Override
@@ -45,7 +44,7 @@ public final class ZoneCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(Component.text("Usage: " + usage(), NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white><usage></white>", Messages.ph("usage", usage()));
             return;
         }
 
@@ -60,7 +59,7 @@ public final class ZoneCommand implements SubCommand {
             case "enable" -> setEnabled(sender, rest, true);
             case "disable" -> setEnabled(sender, rest, false);
             case "buffer" -> buffer(sender, rest);
-            default -> sender.sendMessage(Component.text("Unknown zone action. Usage: " + usage(), NamedTextColor.RED));
+            default -> Messages.error(sender, "Unknown action. Usage: <white><usage></white>", Messages.ph("usage", usage()));
         }
     }
 
@@ -84,18 +83,18 @@ public final class ZoneCommand implements SubCommand {
 
     private void create(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("Only players can create zones (a selection is required).", NamedTextColor.RED));
+            Messages.error(sender, "Only players can create zones — a physical selection is required.");
             return;
         }
 
         if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /momentcraft zone create <name>", NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white>/momentcraft zone create <name></white>");
             return;
         }
 
         String id = args[0].toLowerCase();
         if (plugin.getZoneManager().get(id).isPresent()) {
-            sender.sendMessage(Component.text("A zone named '" + id + "' already exists.", NamedTextColor.RED));
+            Messages.error(sender, "A zone named <white><name></white> already exists.", Messages.ph("name", id));
             return;
         }
 
@@ -103,8 +102,7 @@ public final class ZoneCommand implements SubCommand {
         UUID playerId = player.getUniqueId();
 
         if (!selection.hasCompleteSelection(playerId)) {
-            sender.sendMessage(Component.text(
-                "You need to set both corners with the wand first. Use /momentcraft wand.", NamedTextColor.RED));
+            Messages.error(sender, "Set both corners with the wand first. Run <white>/mc wand</white>.");
             return;
         }
 
@@ -112,7 +110,7 @@ public final class ZoneCommand implements SubCommand {
         Location c2 = selection.getCorner2(playerId);
 
         if (!c1.getWorld().equals(c2.getWorld())) {
-            sender.sendMessage(Component.text("Both corners must be in the same world.", NamedTextColor.RED));
+            Messages.error(sender, "Both corners must be in the same world.");
             return;
         }
 
@@ -131,84 +129,96 @@ public final class ZoneCommand implements SubCommand {
         plugin.getZoneManager().create(zone);
         selection.clear(playerId);
 
-        sender.sendMessage(Component.text("Zone '" + id + "' created.", NamedTextColor.GREEN));
+        Messages.success(sender, "Zone <white><name></white> created.", Messages.ph("name", id));
     }
 
     private void delete(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /momentcraft zone delete <name>", NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white>/momentcraft zone delete <name></white>");
             return;
         }
 
-        boolean removed = plugin.getZoneManager().delete(args[0].toLowerCase());
+        String id = args[0].toLowerCase();
+        boolean removed = plugin.getZoneManager().delete(id);
         if (removed) {
-            sender.sendMessage(Component.text("Zone '" + args[0] + "' deleted.", NamedTextColor.GREEN));
+            Messages.success(sender, "Zone <white><name></white> deleted.", Messages.ph("name", id));
         } else {
-            sender.sendMessage(Component.text("No zone named '" + args[0] + "' exists.", NamedTextColor.RED));
+            Messages.error(sender, "No zone named <white><name></white> exists.", Messages.ph("name", id));
         }
     }
 
     private void list(CommandSender sender) {
         var zones = plugin.getZoneManager().all();
+
+        Messages.raw(sender, Messages.DIVIDER);
+        Messages.raw(sender, "<gradient:gold:yellow><bold>              Capture Zones</bold></gradient>");
+        Messages.raw(sender, Messages.DIVIDER);
+
         if (zones.isEmpty()) {
-            sender.sendMessage(Component.text("No zones defined.", NamedTextColor.GRAY));
-            return;
+            Messages.raw(sender, " <gray><italic>No zones defined yet.</italic></gray>");
+        } else {
+            for (Zone zone : zones) {
+                String dot = zone.enabled() ? "<green>●</green>" : "<dark_gray>●</dark_gray>";
+                Messages.raw(sender, " " + dot + " <white><name></white> <gray>(<world>)</gray>",
+                    Messages.ph("name", zone.id()), Messages.ph("world", zone.world()));
+            }
         }
 
-        sender.sendMessage(Component.text("Zones:", NamedTextColor.GOLD));
-        for (Zone zone : zones) {
-            NamedTextColor color = zone.enabled() ? NamedTextColor.GREEN : NamedTextColor.GRAY;
-            sender.sendMessage(Component.text("- " + zone.id() + " (" + zone.world() + ")", color));
-        }
+        Messages.raw(sender, Messages.DIVIDER);
     }
 
     private void info(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /momentcraft zone info <name>", NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white>/momentcraft zone info <name></white>");
             return;
         }
 
         plugin.getZoneManager().get(args[0].toLowerCase()).ifPresentOrElse(zone -> {
-            sender.sendMessage(Component.text("Zone: " + zone.id(), NamedTextColor.GOLD));
-            sender.sendMessage(Component.text("World: " + zone.world(), NamedTextColor.GRAY));
-            sender.sendMessage(Component.text(
-                "Min: " + zone.minX() + ", " + zone.minY() + ", " + zone.minZ(), NamedTextColor.GRAY));
-            sender.sendMessage(Component.text(
-                "Max: " + zone.maxX() + ", " + zone.maxY() + ", " + zone.maxZ(), NamedTextColor.GRAY));
-            sender.sendMessage(Component.text(
-                "Enabled: " + zone.enabled(), zone.enabled() ? NamedTextColor.GREEN : NamedTextColor.RED));
-        }, () -> sender.sendMessage(Component.text("No zone named '" + args[0] + "' exists.", NamedTextColor.RED)));
+            String statusColor = zone.enabled() ? "green" : "red";
+            String statusText = zone.enabled() ? "Enabled" : "Disabled";
+
+            Messages.raw(sender, Messages.DIVIDER);
+            Messages.raw(sender, " <gradient:gold:yellow><bold><name></bold></gradient>", Messages.ph("name", zone.id()));
+            Messages.raw(sender, Messages.DIVIDER);
+            Messages.raw(sender, " <gray>World</gray>   <white><world></white>", Messages.ph("world", zone.world()));
+            Messages.raw(sender, " <gray>Min</gray>     <white><min></white>",
+                Messages.ph("min", zone.minX() + ", " + zone.minY() + ", " + zone.minZ()));
+            Messages.raw(sender, " <gray>Max</gray>     <white><max></white>",
+                Messages.ph("max", zone.maxX() + ", " + zone.maxY() + ", " + zone.maxZ()));
+            Messages.raw(sender, " <gray>Status</gray>  <" + statusColor + "><status></" + statusColor + ">",
+                Messages.ph("status", statusText));
+            Messages.raw(sender, Messages.DIVIDER);
+        }, () -> Messages.error(sender, "No zone named <white><name></white> exists.", Messages.ph("name", args[0])));
     }
 
     private void setEnabled(CommandSender sender, String[] args, boolean enabled) {
         if (args.length < 1) {
-            sender.sendMessage(Component.text(
-                "Usage: /momentcraft zone " + (enabled ? "enable" : "disable") + " <name>", NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white>/momentcraft zone " + (enabled ? "enable" : "disable") + " <name></white>");
             return;
         }
 
         plugin.getZoneManager().get(args[0].toLowerCase()).ifPresentOrElse(zone -> {
             zone.setEnabled(enabled);
             plugin.getZoneManager().save(zone);
-            sender.sendMessage(Component.text(
-                "Zone '" + zone.id() + "' " + (enabled ? "enabled" : "disabled") + ".", NamedTextColor.GREEN));
-        }, () -> sender.sendMessage(Component.text("No zone named '" + args[0] + "' exists.", NamedTextColor.RED)));
+            String verb = enabled ? "enabled" : "disabled";
+            Messages.success(sender, "Zone <white><name></white> " + verb + ".", Messages.ph("name", zone.id()));
+        }, () -> Messages.error(sender, "No zone named <white><name></white> exists.", Messages.ph("name", args[0])));
     }
 
     private void buffer(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /momentcraft zone buffer <name>", NamedTextColor.RED));
+            Messages.error(sender, "Usage: <white>/momentcraft zone buffer <name></white>");
             return;
         }
 
         String id = args[0].toLowerCase();
         if (plugin.getZoneManager().get(id).isEmpty()) {
-            sender.sendMessage(Component.text("No zone named '" + id + "' exists.", NamedTextColor.RED));
+            Messages.error(sender, "No zone named <white><name></white> exists.", Messages.ph("name", id));
             return;
         }
 
         int size = plugin.getCaptureManager().bufferSize(id);
-        sender.sendMessage(Component.text(
-            "Zone '" + id + "' buffer: " + size + " snapshot(s).", NamedTextColor.GRAY));
+        Messages.info(sender, "Zone <white><name></white> buffer: <aqua><count></aqua> snapshot(s).",
+            Messages.ph("name", id), Messages.ph("count", size));
     }
 }
