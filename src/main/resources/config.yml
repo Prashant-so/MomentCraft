@@ -1,7 +1,7 @@
 # MomentCraft configuration
-# This file grows as features land. Phase 5 adds the performance guard:
-# it watches TPS and free memory, and throttles or pauses capture
-# sampling automatically under load, resuming once things recover.
+# This file grows as features land. Phase 6 adds automatic moment
+# detection: real gameplay events get scored, and anything clearing the
+# threshold gets flagged as a moment worth keeping.
 
 config-version: 1
 
@@ -29,7 +29,26 @@ performance:
   # regardless of TPS.
   min-free-memory-percent: 10.0
 
+scoring:
+  # A moment is only kept/announced if its score meets or exceeds this.
+  threshold: 40
+  # How far (in blocks) to look for other players when scoring "audience size".
+  nearby-player-radius: 20.0
+  weights:
+    base-kill: 10
+    base-boss-kill: 50
+    # Scales up to this amount as the primary player's health approaches 0
+    # at the moment of the event — this is what makes a low-health kill
+    # score much higher than a full-health one.
+    low-health-bonus-max: 30
+    # Added per kill beyond the first in an active killstreak.
+    killstreak-per-kill: 5
+    # Added if the event happened somewhere inherently risky (Nether, End,
+    # or near lava).
+    danger-bonus: 10
+    # Added per other nearby player — more witnesses, more of a "moment".
+    nearby-player-bonus: 5
+
 # Placeholder sections — filled in as each phase is implemented.
-# scoring:
 # storage:
 # discord:
