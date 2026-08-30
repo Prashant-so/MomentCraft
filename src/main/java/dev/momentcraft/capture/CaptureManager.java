@@ -1,5 +1,6 @@
 package dev.momentcraft.capture;
 
+import dev.momentcraft.performance.PerformanceState;
 import dev.momentcraft.plugin.MomentCraftPlugin;
 import dev.momentcraft.zone.Zone;
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ public final class CaptureManager {
     private final MomentCraftPlugin plugin;
     private final Map<String, CaptureBuffer> buffers = new HashMap<>();
     private BukkitTask task;
+    private int throttleSkipCounter = 0;
 
     public CaptureManager(MomentCraftPlugin plugin) {
         this.plugin = plugin;
@@ -36,6 +38,23 @@ public final class CaptureManager {
     }
 
     private void tick() {
+        PerformanceState state = plugin.getPerformanceGuard().state();
+
+        if (state == PerformanceState.PAUSED) {
+            // Do nothing at all — not even the throttle counter — this is
+            // the cheapest possible state, by design.
+            return;
+        }
+
+        if (state == PerformanceState.THROTTLED) {
+            // Only sample on every other tick instead of skipping entirely,
+            // so there's still *some* lead-up footage rather than none.
+            throttleSkipCounter++;
+            if (throttleSkipCounter % 2 != 0) {
+                return;
+            }
+        }
+
         for (Zone zone : plugin.getZoneManager().all()) {
             if (!zone.enabled()) {
                 continue;
@@ -48,8 +67,6 @@ public final class CaptureManager {
 
             List<PlayerSnapshot> inside = playersInside(zone, world);
             if (inside.isEmpty()) {
-                // Nothing in the zone right now — skip entirely, don't even
-                // touch the buffer map for this zone.
                 continue;
             }
 
