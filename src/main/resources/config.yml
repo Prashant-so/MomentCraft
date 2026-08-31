@@ -1,14 +1,6 @@
 # MomentCraft configuration
-# This file grows as features land. Phase 6 adds automatic moment
-# detection: real gameplay events get scored, and anything clearing the
-# threshold gets flagged as a moment worth keeping.
-#
-# Tuning note: these defaults are set so that an ordinary, safe, full-health
-# kill with nobody around scores around 5-9 — nowhere near the threshold.
-# Only a real combination of low health, a streak, danger, or witnesses
-# should push something over the line. If "common" moments are still
-# triggering on your server, raise `threshold` or lower the weight that's
-# stacking up too easily — turn on general.debug to see real numbers first.
+# This file grows as features land. Phase 7 adds job export: a detected
+# moment gets written as a JSON file for an external worker to pick up.
 
 config-version: 1
 
@@ -28,16 +20,9 @@ performance:
   min-free-memory-percent: 10.0
 
 scoring:
-  # A moment is only kept/announced if its score meets or exceeds this.
   threshold: 55
-  # After a player triggers a moment, further moments from that same
-  # player are suppressed for this many seconds — stops one ongoing
-  # killstreak from spamming multiple near-identical notifications.
   cooldown-seconds: 30
-  # How far (in blocks) to look for other players when scoring "audience size".
   nearby-player-radius: 20.0
-  # More than this many nearby players stops adding extra bonus — a
-  # crowded area shouldn't inflate score just from population.
   nearby-player-cap: 3
   weights:
     base-kill: 5
@@ -47,6 +32,13 @@ scoring:
     danger-bonus: 10
     nearby-player-bonus: 4
 
+jobs:
+  # Job files older than this get deleted automatically, in case a
+  # worker isn't running to consume them.
+  max-age-minutes: 60
+  # Hard cap on how many job files can exist at once, regardless of age —
+  # oldest gets deleted first if this is exceeded. Bounded storage.
+  max-count: 200
+
 # Placeholder sections — filled in as each phase is implemented.
-# storage:
 # discord:
