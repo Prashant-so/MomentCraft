@@ -35,7 +35,7 @@ public final class MomentManager {
     public void submit(MomentEvent event) {
         int score = scorer.score(event);
         ScoredMoment scored = new ScoredMoment(event, score);
-        int threshold = plugin.getConfigManager().getScoreThreshold();
+        int threshold = effectiveThreshold(event);
 
         if (plugin.getConfigManager().isDebug()) {
             plugin.getLogger().info(
@@ -63,6 +63,17 @@ public final class MomentManager {
         notifyAdmins(scored);
 
         Bukkit.getPluginManager().callEvent(new MomentDetectedEvent(scored));
+    }
+
+    private int effectiveThreshold(MomentEvent event) {
+        // Boss kills are rare enough on their own merit — they shouldn't
+        // need bonus conditions stacked on top just to clear the same bar
+        // as an ordinary player kill.
+        if (event.type() == MomentType.BOSS_KILL) {
+            return Math.min(plugin.getConfigManager().getScoreThreshold(),
+                plugin.getConfigManager().getScoreBaseBossKill());
+        }
+        return plugin.getConfigManager().getScoreThreshold();
     }
 
     private boolean isOnCooldown(UUID playerId) {
