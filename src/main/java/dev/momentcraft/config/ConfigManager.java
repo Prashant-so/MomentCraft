@@ -114,6 +114,14 @@ public final class ConfigManager {
         return config.getDouble("scoring.nearby-player-radius", 20.0);
     }
 
+    public int getJobMaxAgeMinutes() {
+        return config.getInt("jobs.max-age-minutes", 60);
+    }
+
+    public int getJobMaxCount() {
+        return config.getInt("jobs.max-count", 200);
+    }
+
     public FileConfiguration raw() {
         return config;
     }
