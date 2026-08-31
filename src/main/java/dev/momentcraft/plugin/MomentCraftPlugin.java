@@ -3,6 +3,8 @@ package dev.momentcraft.plugin;
 import dev.momentcraft.capture.CaptureManager;
 import dev.momentcraft.command.MomentCraftCommand;
 import dev.momentcraft.config.ConfigManager;
+import dev.momentcraft.job.JobCleanupTask;
+import dev.momentcraft.job.JobExportListener;
 import dev.momentcraft.moment.MomentListener;
 import dev.momentcraft.moment.MomentManager;
 import dev.momentcraft.performance.PerformanceGuard;
@@ -24,6 +26,7 @@ public final class MomentCraftPlugin extends JavaPlugin {
     private CaptureManager captureManager;
     private PerformanceGuard performanceGuard;
     private MomentManager momentManager;
+    private JobCleanupTask jobCleanupTask;
     private NamespacedKey wandKey;
 
     @Override
@@ -48,8 +51,12 @@ public final class MomentCraftPlugin extends JavaPlugin {
 
         momentManager = new MomentManager(this);
 
+        jobCleanupTask = new JobCleanupTask(this);
+        jobCleanupTask.start();
+
         getServer().getPluginManager().registerEvents(new WandListener(selectionManager, wandKey), this);
         getServer().getPluginManager().registerEvents(new MomentListener(this), this);
+        getServer().getPluginManager().registerEvents(new JobExportListener(this), this);
 
         registerCommands();
 
@@ -74,6 +81,9 @@ public final class MomentCraftPlugin extends JavaPlugin {
         }
         if (performanceGuard != null) {
             performanceGuard.stop();
+        }
+        if (jobCleanupTask != null) {
+            jobCleanupTask.stop();
         }
         getComponentLogger().info(MiniMessage.miniMessage().deserialize("<red>MomentCraft disabled.</red>"));
         instance = null;
