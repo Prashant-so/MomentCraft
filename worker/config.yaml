@@ -1,0 +1,10 @@
+# Path to the plugin's jobs folder. Adjust this to match where your Paper
+# server actually lives relative to this worker folder — if the worker
+# runs on the same machine as the server (the assumed setup), this is
+# just a relative or absolute path to plugins/MomentCraft/jobs.
+jobs_dir: ../server/plugins/MomentCraft/jobs
+
+# How often (in seconds) to check the jobs folder for new files.
+poll_interval_seconds: 2.0
+
+log_level: INFO
